@@ -1,0 +1,31 @@
+
+#dified https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions#enable-auto-merge-on-a-pull-request
+name: Dependabot auto-merge
+on:
+  pull_request:
+    branches:
+      - 'dependabot/'
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto approve
+        uses: juliangruber/approve-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.number }}
+      - name: Enable auto-merge for Dependabot PRs
+        id: automerge
+        uses: "pascalgn/automerge-action@v0.15.2"
+        env:
+          MERGE_METHOD: squash
+          MERGE_RETRIES: 5
+          MERGE_RETRY_SLEEP: 10000
+          MERGE_COMMIT_MESSAGE: "auto-merge action"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
